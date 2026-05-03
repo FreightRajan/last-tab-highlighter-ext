@@ -1,13 +1,18 @@
 {
   "manifest_version": 3,
   "name": "Last Tab Highlighter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Auto-groups your most recently visited tab into a yellow tab group so you never lose your place.",
   "permissions": ["tabs", "tabGroups", "storage"],
   "background": {
-    "service_worker": "service-worker.js"
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Last Tab Highlighter — click to clear"
   },
   "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
     "128": "icon.png"
   }
 }
