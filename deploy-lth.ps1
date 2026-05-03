@@ -1,6 +1,6 @@
 # ===== CONFIG =====
 $RepoPath    = "C:\Users\nijil\Downloads\last-tab-highlighter-ext-main"
-$ExtensionId = "dljkjpphbcgbhlopijbepnolbiibikae"
+$ExtensionId = "lnikjpailojflkliakmmnfpghbabimgp"
 # ==================
 
 if (-not (Test-Path $RepoPath)) {
