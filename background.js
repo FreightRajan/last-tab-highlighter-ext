@@ -1,8 +1,5 @@
 // ===== CONFIG =====
-const GROUP_TITLE      = '◀ HERE';
-const STATE_KEY        = 'lth_state_v3';
-const RGB_CYCLE        = ['red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple', 'pink'];
-const DEFAULT_SETTINGS = { colorMode: 'fixed', fixedColor: 'yellow' };
+const STATE_KEY = 'lth_state_v2';
 // ==================
 
 // In-memory state (source of truth while service worker is alive).
@@ -10,16 +7,14 @@ const DEFAULT_SETTINGS = { colorMode: 'fixed', fixedColor: 'yellow' };
 let memState = {
     currentTabId:    null,
     currentWindowId: null,
-    markedTabId:     null,
-    markedGroupId:   null,
-    rgbIndex:        0,
+    strobingTabId:   null,
 };
 let stateLoaded = false;
 
 // === Serialized handler queue ===
 // All event handlers run through this chain. Guarantees: no two handlers
-// touch tab groups at the same time. Eliminates the race conditions where
-// rapid tab switches would leave stale or missing markers.
+// touch tabs/scripts at the same time. Eliminates race conditions on
+// rapid tab switches.
 let handlerQueue = Promise.resolve();
 function enqueue(fn) {
     handlerQueue = handlerQueue.then(fn).catch(e => console.error('[LTH]', e));
@@ -42,125 +37,79 @@ async function saveState() {
     catch (e) { /* ignore */ }
 }
 
-async function getSettings() {
-    return await chrome.storage.sync.get(DEFAULT_SETTINGS);
+// === Injection guards ===
+function canInject(url) {
+    if (!url) return false;
+    // Allow http(s) and file URLs only. Block chrome://, edge://, about:, the web store, etc.
+    if (!/^(https?|file):/i.test(url)) return false;
+    if (/^https?:\/\/chrome\.google\.com\/webstore/i.test(url)) return false;
+    if (/^https?:\/\/chromewebstore\.google\.com/i.test(url)) return false;
+    return true;
 }
 
-// === Color selection ===
-async function pickAndAdvanceColor() {
-    const settings = await getSettings();
-    if (settings.colorMode !== 'rgb') {
-        return settings.fixedColor || 'yellow';
-    }
-    const idx   = (memState.rgbIndex || 0) % RGB_CYCLE.length;
-    const color = RGB_CYCLE[idx];
-    memState.rgbIndex = (idx + 1) % RGB_CYCLE.length;
-    await saveState();
-    return color;
+async function getTabSafe(tabId) {
+    try { return await chrome.tabs.get(tabId); }
+    catch (e) { return null; }
 }
 
-// === Group helpers ===
-async function groupExists(groupId) {
-    if (groupId == null) return false;
+// === Strobe control ===
+async function startStrobe(tabId) {
+    const tab = await getTabSafe(tabId);
+    if (!tab || !canInject(tab.url)) return false;
     try {
-        await chrome.tabGroups.get(groupId);
+        await chrome.scripting.executeScript({
+            target: { tabId },
+            files:  ['content.js'],
+        });
         return true;
     } catch (e) {
+        console.warn('[LTH] start inject failed for', tabId, e && e.message);
         return false;
     }
 }
 
-async function ungroupTab(tabId) {
-    if (tabId == null) return;
-    try { await chrome.tabs.ungroup(tabId); }
-    catch (e) { /* not in a group, or tab is gone — fine */ }
-}
-
-async function clearAllMarkers() {
-    // Clear our tracked group first (fast path)
-    if (memState.markedGroupId != null && await groupExists(memState.markedGroupId)) {
-        try {
-            const tabs = await chrome.tabs.query({ groupId: memState.markedGroupId });
-            for (const t of tabs) await ungroupTab(t.id);
-        } catch (e) { /* ignore */ }
-    }
-    // Belt-and-suspenders: also sweep any other groups with our title
-    // (handles state migrations, leftover groups from previous versions, etc.)
+async function stopStrobe(tabId) {
+    const tab = await getTabSafe(tabId);
+    if (!tab || !canInject(tab.url)) return;
     try {
-        const groups = await chrome.tabGroups.query({ title: GROUP_TITLE });
-        for (const g of groups) {
-            const tabs = await chrome.tabs.query({ groupId: g.id });
-            for (const t of tabs) await ungroupTab(t.id);
-        }
-    } catch (e) { /* ignore */ }
-
-    memState.markedTabId   = null;
-    memState.markedGroupId = null;
-    await saveState();
-}
-
-async function markTab(tabId) {
-    if (tabId == null) return;
-    try {
-        const tab = await chrome.tabs.get(tabId);
-        if (!tab) return;
-
-        // Always start clean — guarantees only one marker exists at a time
-        await clearAllMarkers();
-
-        const color   = await pickAndAdvanceColor();
-        const groupId = await chrome.tabs.group({
-            tabIds: [tabId],
-            createProperties: { windowId: tab.windowId }
+        await chrome.scripting.executeScript({
+            target: { tabId },
+            func:   () => { if (window.__lthStrobe) window.__lthStrobe.stop(); },
         });
-        await chrome.tabGroups.update(groupId, {
-            color,
-            title: GROUP_TITLE,
-            collapsed: false
-        });
-
-        memState.markedTabId   = tabId;
-        memState.markedGroupId = groupId;
-        await saveState();
     } catch (e) {
-        console.error('[LTH] markTab failed for', tabId, e);
-        // Recovery: nuke everything so we don't get stuck
-        await clearAllMarkers();
+        console.warn('[LTH] stop inject failed for', tabId, e && e.message);
     }
 }
 
 // === Core handler ===
 async function handleTabSwitch(newActiveTabId, newWindowId) {
     await loadState();
-    const leavingTabId = memState.currentTabId;
+    const leavingTabId  = memState.currentTabId;
+    const wasStrobingId = memState.strobingTabId;
 
-    // Update "current" first — if SW dies mid-handler, next event has correct baseline
     memState.currentTabId    = newActiveTabId;
     memState.currentWindowId = newWindowId;
     await saveState();
 
-    // Make sure the tab we just entered isn't wearing the marker
-    if (memState.markedTabId === newActiveTabId) {
-        await ungroupTab(newActiveTabId);
-        memState.markedTabId   = null;
-        memState.markedGroupId = null;
+    // If user returned to the strobing tab, stop it
+    if (wasStrobingId != null && wasStrobingId === newActiveTabId) {
+        await stopStrobe(wasStrobingId);
+        memState.strobingTabId = null;
+        await saveState();
+    }
+
+    // Only one tab strobes at a time — stop any other lingering strobe
+    if (memState.strobingTabId != null && memState.strobingTabId !== newActiveTabId) {
+        await stopStrobe(memState.strobingTabId);
+        memState.strobingTabId = null;
         await saveState();
     }
 
     // Mark the tab we just left
     if (leavingTabId != null && leavingTabId !== newActiveTabId) {
-        await markTab(leavingTabId);
-    }
-}
-
-// === Recolor existing markers when settings change ===
-async function recolorExistingMarker() {
-    const settings = await getSettings();
-    if (settings.colorMode !== 'fixed') return;
-    const color = settings.fixedColor || 'yellow';
-    if (memState.markedGroupId != null && await groupExists(memState.markedGroupId)) {
-        try { await chrome.tabGroups.update(memState.markedGroupId, { color }); }
-        catch (e) { /* ignore */ }
+        const ok = await startStrobe(leavingTabId);
+        memState.strobingTabId = ok ? leavingTabId : null;
+        await saveState();
     }
 }
 
@@ -185,21 +134,24 @@ chrome.tabs.onRemoved.addListener((tabId) => {
             memState.currentTabId = null;
             changed = true;
         }
-        if (memState.markedTabId === tabId) {
-            memState.markedTabId   = null;
-            memState.markedGroupId = null;
+        if (memState.strobingTabId === tabId) {
+            memState.strobingTabId = null; // tab is gone, no need to stop
             changed = true;
         }
         if (changed) await saveState();
     });
 });
 
-chrome.tabGroups.onRemoved.addListener((group) => {
+// Re-inject if the strobing tab navigates (its previous content-script context is gone).
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    if (changeInfo.status !== 'complete') return;
     enqueue(async () => {
         await loadState();
-        if (memState.markedGroupId === group.id) {
-            memState.markedTabId   = null;
-            memState.markedGroupId = null;
+        if (memState.strobingTabId !== tabId) return;
+        if (memState.currentTabId === tabId) return; // user is now on it; nothing to do
+        const ok = await startStrobe(tabId);
+        if (!ok) {
+            memState.strobingTabId = null;
             await saveState();
         }
     });
@@ -208,30 +160,24 @@ chrome.tabGroups.onRemoved.addListener((group) => {
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg && msg.action === 'clear') {
         enqueue(async () => {
-            await clearAllMarkers();
-            memState.rgbIndex = 0;
-            await saveState();
+            await loadState();
+            if (memState.strobingTabId != null) {
+                await stopStrobe(memState.strobingTabId);
+                memState.strobingTabId = null;
+                await saveState();
+            }
             sendResponse({ ok: true });
         });
         return true;
     }
 });
 
-chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== 'sync') return;
-    if (!('colorMode' in changes) && !('fixedColor' in changes)) return;
-    enqueue(() => recolorExistingMarker());
-});
-
 chrome.runtime.onInstalled.addListener(() => {
     enqueue(async () => {
-        await clearAllMarkers();
         memState = {
             currentTabId:    null,
             currentWindowId: null,
-            markedTabId:     null,
-            markedGroupId:   null,
-            rgbIndex:        0,
+            strobingTabId:   null,
         };
         stateLoaded = true;
         const [activeTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
@@ -245,13 +191,10 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.runtime.onStartup.addListener(() => {
     enqueue(async () => {
-        await clearAllMarkers();
         memState = {
             currentTabId:    null,
             currentWindowId: null,
-            markedTabId:     null,
-            markedGroupId:   null,
-            rgbIndex:        0,
+            strobingTabId:   null,
         };
         stateLoaded = true;
         await saveState();

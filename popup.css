@@ -12,38 +12,14 @@ body {
 
 h1 {
     font-size: 14px;
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     font-weight: 600;
 }
 
-fieldset {
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 10px 12px 6px;
+.desc {
     margin: 0 0 12px;
-}
-
-legend {
-    padding: 0 6px;
-    color: #666;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 6px;
-    cursor: pointer;
-}
-
-#color-select {
-    width: calc(100% - 22px);
-    margin: 0 0 10px 22px;
-    padding: 4px 6px;
-    font-size: 13px;
+    color: #555;
+    line-height: 1.4;
 }
 
 button {
@@ -68,12 +44,10 @@ button:active { background: #e0e0e0; }
 }
 
 @media (prefers-color-scheme: dark) {
-    body          { background: #2a2a2a; color: #ddd; }
-    fieldset      { border-color: #444; }
-    legend        { color: #aaa; }
-    #color-select { background: #333; color: #ddd; border: 1px solid #555; }
-    button        { background: #3a3a3a; color: #ddd; border-color: #555; }
-    button:hover  { background: #444; }
-    button:active { background: #555; }
-    #status       { color: #6acf6a; }
+    body         { background: #2a2a2a; color: #ddd; }
+    .desc        { color: #aaa; }
+    button       { background: #3a3a3a; color: #ddd; border-color: #555; }
+    button:hover { background: #444; }
+    button:active{ background: #555; }
+    #status      { color: #6acf6a; }
 }
