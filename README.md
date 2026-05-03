@@ -68,6 +68,7 @@ No network access, no data collection, no content scripts.
 
 ## Changelog
 
+- **1.3.0** — rock-solid tab-switch reliability. All event handlers now run through a serialized promise queue (no race conditions on rapid switches). State lives in memory with `chrome.storage.session` as a backup, so SW sleeps don't drop the marker. Marker group tracked by ID and verified before reuse. Listens for `chrome.tabGroups.onRemoved` to clean up state if you manually break the group. UI unchanged.
 - **1.2.0** — added a popup with a color picker (grey/blue/red/yellow/green/pink/purple/cyan/orange) and an RGB cycle mode. Toolbar click now opens the popup; the clear-highlights action moved into a button there.
 - **1.1.0** — persist state in `chrome.storage.session` (fixes "highlight disappears after opening a new tab"). Added Windows deploy script.
 - **1.0.0** — initial release.

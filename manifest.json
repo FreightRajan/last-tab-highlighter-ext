@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Last Tab Highlighter",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Auto-groups your most recently visited tab into a colored tab group so you never lose your place. Pick any color or use RGB cycle mode.",
   "permissions": ["tabs", "tabGroups", "storage"],
   "background": {
