@@ -1,12 +1,14 @@
 # Last Tab Highlighter (Chrome Extension)
 
-A Chrome extension that auto-groups your most recently visited tab into a yellow tab group — so when you're 40 tabs deep, the tab you just left is visibly highlighted in the tab strip.
+A Chrome extension that auto-groups your most recently visited tab into a colored tab group — so when you're 40 tabs deep, the tab you just left is visibly highlighted in the tab strip.
 
 Unlike a Tampermonkey script (which can only modify the favicon and title), this uses Chrome's `tabGroups` API to color the actual tab background.
 
 ## How it works
 
-When you switch from tab A → tab B, tab A gets put into a one-tab yellow group titled `◀ HERE`. Switch to tab C and now B becomes the yellow one. Only one tab is ever marked. Click the extension's toolbar icon to clear all markers.
+When you switch from tab A → tab B, tab A gets put into a one-tab colored group titled `◀ HERE`. Switch to tab C and now B becomes the colored one. Only one tab is ever marked.
+
+Click the toolbar icon to open the popup, where you can change the color, switch on RGB mode, or clear all highlights.
 
 ## Install
 
@@ -18,7 +20,17 @@ When you switch from tab A → tab B, tab A gets put into a one-tab yellow group
 3. Toggle **Developer mode** on (top right)
 4. Click **Load unpacked**
 5. Select the cloned folder
-6. Done — switch tabs and watch the previous one go yellow
+6. Done — switch tabs and watch the previous one turn yellow (or whatever color you pick)
+
+## Picking a color
+
+Click the extension's toolbar icon to open the popup:
+
+- **Pick a color** — choose any of Chrome's nine supported tab-group colors: grey, blue, red, yellow, green, pink, purple, cyan, orange.
+- **RGB mode** — each tab switch picks the next color in a rainbow cycle (red → orange → yellow → green → cyan → blue → purple → pink → repeat).
+- **Clear all highlights** — wipe the marker group; the next tab switch starts fresh.
+
+Settings save automatically and sync across your Chrome installs via `chrome.storage.sync`.
 
 ## One-click deploy on Windows
 
@@ -37,25 +49,26 @@ After a change is pushed to GitHub, pull + reload in one move with the included 
 
 > **Why one click and not zero?** Chrome blocks scripts from programmatically reloading unpacked extensions. That click is a security boundary.
 
-## Configuration
+## Configuration (advanced)
 
-Edit the CONFIG block at the top of `background.js`:
+Most settings are now in the popup. The CONFIG block at the top of `background.js` still controls:
 
 | Option | Default | Notes |
 |---|---|---|
-| `GROUP_COLOR` | `'yellow'` | Chrome only allows: `grey`, `blue`, `red`, `yellow`, `green`, `pink`, `purple`, `cyan`, `orange`. |
 | `GROUP_TITLE` | `'◀ HERE'` | The label shown on the group's colored pill. Set to `''` to hide. |
+| `RGB_CYCLE`   | `['red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple', 'pink']` | Order used in RGB mode. Must use Chrome's allowed names. |
 
 ## Permissions
 
 - `tabs` — detect tab activation events
 - `tabGroups` — create and color the marker group
-- `storage` — persist state across MV3 service worker sleeps
+- `storage` — persist your color preference (`storage.sync`) and the previously-active tab across service-worker restarts (`storage.session`)
 
 No network access, no data collection, no content scripts.
 
 ## Changelog
 
+- **1.2.0** — added a popup with a color picker (grey/blue/red/yellow/green/pink/purple/cyan/orange) and an RGB cycle mode. Toolbar click now opens the popup; the clear-highlights action moved into a button there.
 - **1.1.0** — persist state in `chrome.storage.session` (fixes "highlight disappears after opening a new tab"). Added Windows deploy script.
 - **1.0.0** — initial release.
 

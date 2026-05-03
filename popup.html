@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Last Tab Highlighter</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <h1>Last Tab Highlighter</h1>
+
+    <fieldset>
+        <legend>Highlight color</legend>
+
+        <label class="row">
+            <input type="radio" name="mode" value="fixed" id="mode-fixed">
+            <span>Pick a color:</span>
+        </label>
+
+        <select id="color-select" aria-label="Highlight color">
+            <option value="grey">Grey</option>
+            <option value="blue">Blue</option>
+            <option value="red">Red</option>
+            <option value="yellow">Yellow</option>
+            <option value="green">Green</option>
+            <option value="pink">Pink</option>
+            <option value="purple">Purple</option>
+            <option value="cyan">Cyan</option>
+            <option value="orange">Orange</option>
+        </select>
+
+        <label class="row">
+            <input type="radio" name="mode" value="rgb" id="mode-rgb">
+            <span>RGB mode (cycle through colors)</span>
+        </label>
+    </fieldset>
+
+    <button id="clear-btn">Clear all highlights</button>
+
+    <p id="status" aria-live="polite"></p>
+
+    <script src="popup.js"></script>
+</body>
+</html>
