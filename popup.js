@@ -11,7 +11,7 @@ function flashStatus(text) {
 clearBtn.addEventListener('click', async () => {
     try {
         await chrome.runtime.sendMessage({ action: 'clear' });
-        flashStatus('Stopped');
+        flashStatus('Cleared');
     } catch (e) {
         flashStatus('Error: ' + e.message);
     }

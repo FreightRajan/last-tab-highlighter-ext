@@ -7,7 +7,7 @@ const STATE_KEY = 'lth_state_v2';
 let memState = {
     currentTabId:    null,
     currentWindowId: null,
-    strobingTabId:   null,
+    markedTabId:     null,
 };
 let stateLoaded = false;
 
@@ -40,7 +40,6 @@ async function saveState() {
 // === Injection guards ===
 function canInject(url) {
     if (!url) return false;
-    // Allow http(s) and file URLs only. Block chrome://, edge://, about:, the web store, etc.
     if (!/^(https?|file):/i.test(url)) return false;
     if (/^https?:\/\/chrome\.google\.com\/webstore/i.test(url)) return false;
     if (/^https?:\/\/chromewebstore\.google\.com/i.test(url)) return false;
@@ -52,8 +51,8 @@ async function getTabSafe(tabId) {
     catch (e) { return null; }
 }
 
-// === Strobe control ===
-async function startStrobe(tabId) {
+// === Marker control ===
+async function startMarker(tabId) {
     const tab = await getTabSafe(tabId);
     if (!tab || !canInject(tab.url)) return false;
     try {
@@ -68,13 +67,13 @@ async function startStrobe(tabId) {
     }
 }
 
-async function stopStrobe(tabId) {
+async function stopMarker(tabId) {
     const tab = await getTabSafe(tabId);
     if (!tab || !canInject(tab.url)) return;
     try {
         await chrome.scripting.executeScript({
             target: { tabId },
-            func:   () => { if (window.__lthStrobe) window.__lthStrobe.stop(); },
+            func:   () => { if (window.__lthMarker) window.__lthMarker.stop(); },
         });
     } catch (e) {
         console.warn('[LTH] stop inject failed for', tabId, e && e.message);
@@ -84,31 +83,31 @@ async function stopStrobe(tabId) {
 // === Core handler ===
 async function handleTabSwitch(newActiveTabId, newWindowId) {
     await loadState();
-    const leavingTabId  = memState.currentTabId;
-    const wasStrobingId = memState.strobingTabId;
+    const leavingTabId = memState.currentTabId;
+    const wasMarkedId  = memState.markedTabId;
 
     memState.currentTabId    = newActiveTabId;
     memState.currentWindowId = newWindowId;
     await saveState();
 
-    // If user returned to the strobing tab, stop it
-    if (wasStrobingId != null && wasStrobingId === newActiveTabId) {
-        await stopStrobe(wasStrobingId);
-        memState.strobingTabId = null;
+    // If user returned to the marked tab, clear it
+    if (wasMarkedId != null && wasMarkedId === newActiveTabId) {
+        await stopMarker(wasMarkedId);
+        memState.markedTabId = null;
         await saveState();
     }
 
-    // Only one tab strobes at a time — stop any other lingering strobe
-    if (memState.strobingTabId != null && memState.strobingTabId !== newActiveTabId) {
-        await stopStrobe(memState.strobingTabId);
-        memState.strobingTabId = null;
+    // Only one tab marked at a time — clear any other lingering marker
+    if (memState.markedTabId != null && memState.markedTabId !== newActiveTabId) {
+        await stopMarker(memState.markedTabId);
+        memState.markedTabId = null;
         await saveState();
     }
 
     // Mark the tab we just left
     if (leavingTabId != null && leavingTabId !== newActiveTabId) {
-        const ok = await startStrobe(leavingTabId);
-        memState.strobingTabId = ok ? leavingTabId : null;
+        const ok = await startMarker(leavingTabId);
+        memState.markedTabId = ok ? leavingTabId : null;
         await saveState();
     }
 }
@@ -134,24 +133,24 @@ chrome.tabs.onRemoved.addListener((tabId) => {
             memState.currentTabId = null;
             changed = true;
         }
-        if (memState.strobingTabId === tabId) {
-            memState.strobingTabId = null; // tab is gone, no need to stop
+        if (memState.markedTabId === tabId) {
+            memState.markedTabId = null;
             changed = true;
         }
         if (changed) await saveState();
     });
 });
 
-// Re-inject if the strobing tab navigates (its previous content-script context is gone).
+// Re-inject if the marked tab navigates (its previous content-script context is gone).
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
     if (changeInfo.status !== 'complete') return;
     enqueue(async () => {
         await loadState();
-        if (memState.strobingTabId !== tabId) return;
-        if (memState.currentTabId === tabId) return; // user is now on it; nothing to do
-        const ok = await startStrobe(tabId);
+        if (memState.markedTabId !== tabId) return;
+        if (memState.currentTabId === tabId) return;
+        const ok = await startMarker(tabId);
         if (!ok) {
-            memState.strobingTabId = null;
+            memState.markedTabId = null;
             await saveState();
         }
     });
@@ -161,9 +160,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg && msg.action === 'clear') {
         enqueue(async () => {
             await loadState();
-            if (memState.strobingTabId != null) {
-                await stopStrobe(memState.strobingTabId);
-                memState.strobingTabId = null;
+            if (memState.markedTabId != null) {
+                await stopMarker(memState.markedTabId);
+                memState.markedTabId = null;
                 await saveState();
             }
             sendResponse({ ok: true });
@@ -177,7 +176,7 @@ chrome.runtime.onInstalled.addListener(() => {
         memState = {
             currentTabId:    null,
             currentWindowId: null,
-            strobingTabId:   null,
+            markedTabId:     null,
         };
         stateLoaded = true;
         const [activeTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
@@ -194,7 +193,7 @@ chrome.runtime.onStartup.addListener(() => {
         memState = {
             currentTabId:    null,
             currentWindowId: null,
-            strobingTabId:   null,
+            markedTabId:     null,
         };
         stateLoaded = true;
         await saveState();

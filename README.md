@@ -1,14 +1,14 @@
 # Last Tab Highlighter (Chrome Extension)
 
-When you switch away from a tab, its favicon and title strobe through cycling colors so you never lose your place. Return to the tab and the strobe stops.
+Marks the tab you just left with a `◀ HERE` prefix in its title, so when you're 40 tabs deep you can find your way back. Return to the tab and the prefix is removed.
 
-No tab groups, no chrome UI changes — only the page's own favicon and title get touched, then restored when you come back.
+No favicon changes. No tab groups. Just the page's own title.
 
 ## How it works
 
-When you switch from tab A → tab B, the extension injects `content.js` into tab A. That script swaps the favicon for a colored circle, prepends a colored emoji to the title, and cycles through six rainbow colors at ~700ms per step. As soon as you switch back to tab A, the strobe stops and the original favicon and title are restored.
+When you switch from tab A → tab B, the extension injects `content.js` into tab A. That script prepends `◀ HERE ` to `document.title` and installs a `MutationObserver` so the prefix stays put even on sites that constantly rewrite their own title (Gmail unread counts, Slack, Discord, etc.). When you return to tab A, the observer is disconnected and the original title is restored.
 
-Only the most recent "leaving" tab strobes — switching A → B → C means C strobes (and B's strobe stops, since you've passed it).
+Only the most recent "leaving" tab is marked — switching A → B → C means C is marked (and B's marker is cleared, since you've passed it).
 
 ## Install
 
@@ -20,18 +20,18 @@ Only the most recent "leaving" tab strobes — switching A → B → C means C s
 3. Toggle **Developer mode** on (top right)
 4. Click **Load unpacked**
 5. Select the cloned folder
-6. Switch tabs and watch the previous tab's favicon strobe
+6. Switch tabs and watch the previous tab's title pick up a `◀ HERE` prefix
 
-## Stopping a strobe early
+## Clearing the marker
 
 Three ways:
-- Switch back to the strobing tab — its strobe stops automatically.
-- Click the extension's toolbar icon and press **Stop strobe** in the popup.
-- Close the strobing tab.
+- Switch back to the marked tab — the prefix is removed automatically.
+- Click the extension's toolbar icon and press **Clear marker** in the popup.
+- Close the marked tab.
 
-## What pages don't strobe?
+## What pages don't get marked?
 
-The extension can't inject scripts into Chrome's protected pages, so the strobe is silently skipped on:
+The extension can't inject scripts into Chrome's protected pages, so those are silently skipped:
 - `chrome://`, `chrome-extension://`, `edge://`, `about:`, etc.
 - The Chrome Web Store (`chrome.google.com/webstore`, `chromewebstore.google.com`)
 
@@ -56,12 +56,11 @@ After a change is pushed to GitHub, pull + reload in one move with the included 
 
 ## Configuration (advanced)
 
-Tweak the constants at the top of `content.js`:
+Tweak the constant at the top of `content.js`:
 
 | Option | Default | Notes |
 |---|---|---|
-| `COLORS`      | red, orange, yellow, green, blue, purple | The cycle. Each entry has a hex (favicon) and an emoji (title prefix). Add/remove freely. |
-| `INTERVAL_MS` | `700` | Milliseconds between color steps. Lower = faster strobe. |
+| `PREFIX` | `'◀ HERE '` | The string prepended to the title. The trailing space separates it from the page's own title. |
 
 ## Permissions
 
@@ -69,10 +68,11 @@ Tweak the constants at the top of `content.js`:
 - `storage` — track which tab is "previous" across service-worker restarts (`storage.session`)
 - `<all_urls>` host permission — required so injection works on every site you visit
 
-No network access, no data collection.
+No network access, no data collection, no favicon manipulation.
 
 ## Changelog
 
+- **2.1.0** — removed all favicon manipulation and color cycling. The marker is now a static `◀ HERE` prefix on the leaving tab's title — same look as the v1.x tab-group title, but applied to the page's own title instead of a tab group. Added a `MutationObserver` to keep the prefix sticky on sites that rewrite their own title.
 - **2.0.0** — complete rewrite. Removed tab groups; the previous tab is now highlighted by strobing its own favicon and title through cycling RGB colors. Uses `chrome.scripting.executeScript()` and a content script that snapshots the original favicon/title on start and restores them on stop. Removed `tabGroups` permission, added `scripting` and `<all_urls>`.
 - **1.3.0** — rock-solid tab-switch reliability. All event handlers now run through a serialized promise queue (no race conditions on rapid switches). State lives in memory with `chrome.storage.session` as a backup, so SW sleeps don't drop the marker. Marker group tracked by ID and verified before reuse. Listens for `chrome.tabGroups.onRemoved` to clean up state if you manually break the group. UI unchanged.
 - **1.2.0** — added a popup with a color picker (grey/blue/red/yellow/green/pink/purple/cyan/orange) and an RGB cycle mode. Toolbar click now opens the popup; the clear-highlights action moved into a button there.

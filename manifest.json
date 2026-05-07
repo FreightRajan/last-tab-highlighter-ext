@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Last Tab Highlighter",
-  "version": "2.0.0",
-  "description": "When you switch away from a tab, its favicon and title strobe through cycling colors so you never lose your place.",
+  "version": "2.1.0",
+  "description": "Marks the tab you just left with a ◀ HERE prefix in the title so you can find your way back.",
   "permissions": ["scripting", "storage"],
   "host_permissions": ["<all_urls>"],
   "background": {
