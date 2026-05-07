@@ -7,7 +7,7 @@ body {
     font-size: 13px;
     margin: 0;
     padding: 14px;
-    width: 270px;
+    width: 250px;
 }
 
 h1 {
@@ -20,38 +20,6 @@ h1 {
     margin: 0 0 12px;
     color: #555;
     line-height: 1.4;
-}
-
-fieldset {
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 8px 12px 4px;
-    margin: 0 0 12px;
-}
-
-legend {
-    padding: 0 6px;
-    color: #666;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.row {
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
-    margin-bottom: 6px;
-    cursor: pointer;
-    line-height: 1.35;
-}
-
-.row input[type="radio"] {
-    margin-top: 2px;
-}
-
-.row strong {
-    font-weight: 600;
 }
 
 button {
@@ -78,8 +46,6 @@ button:active { background: #e0e0e0; }
 @media (prefers-color-scheme: dark) {
     body         { background: #2a2a2a; color: #ddd; }
     .desc        { color: #aaa; }
-    fieldset     { border-color: #444; }
-    legend       { color: #aaa; }
     button       { background: #3a3a3a; color: #ddd; border-color: #555; }
     button:hover { background: #444; }
     button:active{ background: #555; }
