@@ -1,5 +1,7 @@
 // ===== CONFIG =====
-const STATE_KEY = 'lth_state_v2';
+const STATE_KEY    = 'lth_state_v2';
+const SETTINGS_KEY = 'effectMode';
+const DEFAULT_MODE = 'strobe';
 // ==================
 
 // In-memory state (source of truth while service worker is alive).
@@ -12,9 +14,6 @@ let memState = {
 let stateLoaded = false;
 
 // === Serialized handler queue ===
-// All event handlers run through this chain. Guarantees: no two handlers
-// touch tabs/scripts at the same time. Eliminates race conditions on
-// rapid tab switches.
 let handlerQueue = Promise.resolve();
 function enqueue(fn) {
     handlerQueue = handlerQueue.then(fn).catch(e => console.error('[LTH]', e));
@@ -37,10 +36,16 @@ async function saveState() {
     catch (e) { /* ignore */ }
 }
 
+async function getMode() {
+    try {
+        const s = await chrome.storage.sync.get({ [SETTINGS_KEY]: DEFAULT_MODE });
+        return s[SETTINGS_KEY];
+    } catch (e) { return DEFAULT_MODE; }
+}
+
 // === Injection guards ===
 function canInject(url) {
     if (!url) return false;
-    // Allow http(s) and file URLs only. Block chrome://, edge://, about:, the web store, etc.
     if (!/^(https?|file):/i.test(url)) return false;
     if (/^https?:\/\/chrome\.google\.com\/webstore/i.test(url)) return false;
     if (/^https?:\/\/chromewebstore\.google\.com/i.test(url)) return false;
@@ -54,6 +59,8 @@ async function getTabSafe(tabId) {
 
 // === Strobe control ===
 async function startStrobe(tabId) {
+    const mode = await getMode();
+    if (mode === 'off') return false;
     const tab = await getTabSafe(tabId);
     if (!tab || !canInject(tab.url)) return false;
     try {
@@ -91,21 +98,18 @@ async function handleTabSwitch(newActiveTabId, newWindowId) {
     memState.currentWindowId = newWindowId;
     await saveState();
 
-    // If user returned to the strobing tab, stop it
     if (wasStrobingId != null && wasStrobingId === newActiveTabId) {
         await stopStrobe(wasStrobingId);
         memState.strobingTabId = null;
         await saveState();
     }
 
-    // Only one tab strobes at a time — stop any other lingering strobe
     if (memState.strobingTabId != null && memState.strobingTabId !== newActiveTabId) {
         await stopStrobe(memState.strobingTabId);
         memState.strobingTabId = null;
         await saveState();
     }
 
-    // Mark the tab we just left
     if (leavingTabId != null && leavingTabId !== newActiveTabId) {
         const ok = await startStrobe(leavingTabId);
         memState.strobingTabId = ok ? leavingTabId : null;
@@ -135,20 +139,19 @@ chrome.tabs.onRemoved.addListener((tabId) => {
             changed = true;
         }
         if (memState.strobingTabId === tabId) {
-            memState.strobingTabId = null; // tab is gone, no need to stop
+            memState.strobingTabId = null;
             changed = true;
         }
         if (changed) await saveState();
     });
 });
 
-// Re-inject if the strobing tab navigates (its previous content-script context is gone).
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
     if (changeInfo.status !== 'complete') return;
     enqueue(async () => {
         await loadState();
         if (memState.strobingTabId !== tabId) return;
-        if (memState.currentTabId === tabId) return; // user is now on it; nothing to do
+        if (memState.currentTabId === tabId) return;
         const ok = await startStrobe(tabId);
         if (!ok) {
             memState.strobingTabId = null;
@@ -170,6 +173,24 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         });
         return true;
     }
+});
+
+// When mode is set to 'off', stop any in-flight strobe immediately.
+// Mode change between 'strobe' and 'smooth' is handled by content.js's own
+// storage listener — no background action needed there.
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'sync') return;
+    if (!(SETTINGS_KEY in changes)) return;
+    const newMode = changes[SETTINGS_KEY].newValue;
+    if (newMode !== 'off') return;
+    enqueue(async () => {
+        await loadState();
+        if (memState.strobingTabId != null) {
+            await stopStrobe(memState.strobingTabId);
+            memState.strobingTabId = null;
+            await saveState();
+        }
+    });
 });
 
 chrome.runtime.onInstalled.addListener(() => {

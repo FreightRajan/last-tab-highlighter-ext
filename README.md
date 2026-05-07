@@ -22,6 +22,16 @@ Only the most recent "leaving" tab strobes — switching A → B → C means C s
 5. Select the cloned folder
 6. Switch tabs and watch the previous tab's favicon strobe
 
+## RGB effect modes
+
+Click the extension's toolbar icon to pick which effect runs on the leaving tab:
+
+- **Classic strobe** (default) — favicon cycles through 6 RGB colors at ~700ms each, title prefix cycles colored emoji to match.
+- **Smooth rainbow** — favicon rotates continuously through the full HSL hue circle (~3.6s per rotation, 20fps), title prefix is a static `◀`.
+- **Off** — extension stays dormant and doesn't touch any tab.
+
+The selection saves to `chrome.storage.sync` and applies live — switching modes while a tab is currently strobing will swap the effect on the spot. Settings sync across your Chrome installs.
+
 ## Stopping a strobe early
 
 Three ways:
@@ -73,6 +83,7 @@ No network access, no data collection.
 
 ## Changelog
 
+- **2.1.0** — RGB effect picker in the popup. Choose between classic 6-color strobe (existing behavior, default), smooth rainbow hue rotation, or off. Selection persists in `chrome.storage.sync` and applies live to any in-flight strobe.
 - **2.0.0** — complete rewrite. Removed tab groups; the previous tab is now highlighted by strobing its own favicon and title through cycling RGB colors. Uses `chrome.scripting.executeScript()` and a content script that snapshots the original favicon/title on start and restores them on stop. Removed `tabGroups` permission, added `scripting` and `<all_urls>`.
 - **1.3.0** — rock-solid tab-switch reliability. All event handlers now run through a serialized promise queue (no race conditions on rapid switches). State lives in memory with `chrome.storage.session` as a backup, so SW sleeps don't drop the marker. Marker group tracked by ID and verified before reuse. Listens for `chrome.tabGroups.onRemoved` to clean up state if you manually break the group. UI unchanged.
 - **1.2.0** — added a popup with a color picker (grey/blue/red/yellow/green/pink/purple/cyan/orange) and an RGB cycle mode. Toolbar click now opens the popup; the clear-highlights action moved into a button there.

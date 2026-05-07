@@ -1,11 +1,12 @@
 (function () {
-    // Idempotent: subsequent injections just (re)start the existing strobe.
+    // Idempotent: subsequent injections just refresh the existing strobe state.
     if (window.__lthStrobe) {
-        try { window.__lthStrobe.start(); } catch (e) { /* ignore */ }
+        try { window.__lthStrobe.refresh(); } catch (e) { /* ignore */ }
         return;
     }
 
-    const COLORS = [
+    // ===== CONFIG =====
+    const STROBE_COLORS = [
         { hex: '#ff3838', emoji: '\u{1F534}' }, // red
         { hex: '#ff9500', emoji: '\u{1F7E0}' }, // orange
         { hex: '#ffd000', emoji: '\u{1F7E1}' }, // yellow
@@ -13,22 +14,28 @@
         { hex: '#3b8aff', emoji: '\u{1F535}' }, // blue
         { hex: '#a55cff', emoji: '\u{1F7E3}' }, // purple
     ];
-    const INTERVAL_MS = 700;
-    const PREFIX_REGEX = /^[\u{1F534}\u{1F7E0}\u{1F7E1}\u{1F7E2}\u{1F535}\u{1F7E3}]\s*/u;
+    const STROBE_INTERVAL_MS = 700;
+    const SMOOTH_INTERVAL_MS = 50;
+    const SMOOTH_HUE_STEP    = 5; // degrees per tick → 360° / 5 / 20fps = 3.6s per full rotation
+    const SMOOTH_TITLE_PREFIX = '◀'; // ◀
+    const PREFIX_REGEX = /^[\u{1F534}\u{1F7E0}\u{1F7E1}\u{1F7E2}\u{1F535}\u{1F7E3}◀]\s*/u;
+    // ==================
 
+    let mode          = null;
     let intervalId    = null;
     let originalTitle = null;
     let originalIcons = null;
     let cycleIdx      = 0;
+    let hueDeg        = 0;
 
-    function makeIconDataUrl(hex) {
+    function makeCircleIcon(fillStyle) {
         const canvas = document.createElement('canvas');
         canvas.width = canvas.height = 32;
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, 32, 32);
         ctx.beginPath();
         ctx.arc(16, 16, 14, 0, 2 * Math.PI);
-        ctx.fillStyle = hex;
+        ctx.fillStyle = fillStyle;
         ctx.fill();
         return canvas.toDataURL('image/png');
     }
@@ -58,27 +65,39 @@
         document.head.appendChild(link);
     }
 
-    function setTitleWithPrefix(emoji) {
+    function setTitleWithPrefix(prefix) {
         const baseTitle = (document.title || '').replace(PREFIX_REGEX, '');
-        document.title  = emoji + ' ' + baseTitle;
+        document.title  = prefix + ' ' + baseTitle;
     }
 
-    function tick() {
-        const c = COLORS[cycleIdx % COLORS.length];
+    function tickStrobe() {
+        const c = STROBE_COLORS[cycleIdx % STROBE_COLORS.length];
         cycleIdx++;
         try {
-            setIcon(makeIconDataUrl(c.hex));
+            setIcon(makeCircleIcon(c.hex));
             setTitleWithPrefix(c.emoji);
-        } catch (e) {
-            console.warn('[LTH content] tick failed', e);
-        }
+        } catch (e) { console.warn('[LTH content] strobe tick failed', e); }
+    }
+
+    function tickSmooth() {
+        try {
+            setIcon(makeCircleIcon('hsl(' + hueDeg + ', 100%, 50%)'));
+            setTitleWithPrefix(SMOOTH_TITLE_PREFIX);
+            hueDeg = (hueDeg + SMOOTH_HUE_STEP) % 360;
+        } catch (e) { console.warn('[LTH content] smooth tick failed', e); }
     }
 
     function start() {
         if (intervalId !== null) return;
+        if (mode !== 'strobe' && mode !== 'smooth') return;
         snapshotIfNeeded();
-        tick();
-        intervalId = setInterval(tick, INTERVAL_MS);
+        if (mode === 'smooth') {
+            tickSmooth();
+            intervalId = setInterval(tickSmooth, SMOOTH_INTERVAL_MS);
+        } else {
+            tickStrobe();
+            intervalId = setInterval(tickStrobe, STROBE_INTERVAL_MS);
+        }
     }
 
     function stop() {
@@ -103,8 +122,31 @@
             originalIcons = null;
         }
         cycleIdx = 0;
+        hueDeg   = 0;
     }
 
-    window.__lthStrobe = { start, stop };
-    start();
+    async function readMode() {
+        try {
+            const s = await chrome.storage.sync.get({ effectMode: 'strobe' });
+            return s.effectMode;
+        } catch (e) {
+            return 'strobe';
+        }
+    }
+
+    async function refresh() {
+        const newMode = await readMode();
+        if (newMode === mode && (mode === 'off' || intervalId !== null)) return;
+        if (intervalId !== null) stop();
+        mode = newMode;
+        if (mode !== 'off') start();
+    }
+
+    chrome.storage.onChanged.addListener((changes, area) => {
+        if (area !== 'sync') return;
+        if ('effectMode' in changes) refresh();
+    });
+
+    window.__lthStrobe = { start, stop, refresh };
+    refresh();
 })();
