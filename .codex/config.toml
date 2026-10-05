@@ -1,0 +1,5 @@
+# OPENWIKI:MCP:START
+[mcp_servers.openwiki]
+command = "npx"
+args = ["--yes", "openwiki@0.7.0", "mcp", "--host", "codex"]
+# OPENWIKI:MCP:END
