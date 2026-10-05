@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:ea3622ebb929e63248c841bbffff698ab45126d9d17677c663acda0cec6dba62",
+  "claims": [
+    {
+      "id": "claim_38415854d9d24a579c390e599e9596fd",
+      "statement": "The worker tracks current and marked tab IDs in memory, persists under lth_state_v2 in storage.session, and serializes event work through one promise queue.",
+      "evidence": [
+        {
+          "resource": "repo://background.js#L1-L38",
+          "version": "repo-lines-v1:sha256:8bbe86cc4edc1c0034dd86187fe27bf45a04c9e8e4562fe42585ad393c9e4b47:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4NWU0ZTJkZTI0YzFmMjcwYzU5OGUxNDAzNWJhOWU5MjU4ZjY4N2YyZTc3NTQ4MjI3ZGRiMTFmNGMyNDEwMTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5NmQwNDIyN2M1YTE5OTY3ZWEzNjk0ODQ2OGQzMGY3OWQwNjMwNmU2MDhmMGJhNDA1YzUwMDk2ODBjMTZkZWQifQ"
+        },
+        {
+          "resource": "repo://background.js#L118-L201",
+          "version": "repo-lines-v1:sha256:55247a0b3d189c0b6f26e28ec9d625d4db4c97a5f5fd0cdccb502f95a9394417:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzOGNiZDBjYmU5NDY1M2YwMWRkMjhkZTVlMmRkMTU4MDAyY2E1Y2UzM2M5MjY1NmVjYWNhYjlhZWJhNDM1ZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_75500b59f3534e399b967ad138bee3ca",
+      "statement": "handleTabSwitch records the new active tab, removes any prior marker, and records the leaving tab as marked only after successful injection.",
+      "evidence": [
+        {
+          "resource": "repo://background.js#L85-L115",
+          "version": "repo-lines-v1:sha256:bdf325eabaf30ded9c5578d71b6b8f67bbb250c513de44c8362a21fb7317d025:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2MjkxOWZkNWMxMWYyOTZhZTQ5MTZkZDMyYmJjYTk1YTM3M2IzZDA0YmEzNTg5M2VhZGRkMzY4OThlZWVlYzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0M2ZjMTdlZTU5YTFlNGQ1M2RhNjliZjA3NjhmMWEwZjQ5MWRlYTBmYjljOWQ5MTI4YmMxMDdkOTBiYzY1N2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxZGQwYjg4YTFjNzdjM2FmMmZlNTQ3ZDdjNzU5MWUwMWVmZWQ5ZGE3N2Y2MTg4NTY5MmM5Mjc0YTA0YTM3YzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZjMDRlYzJlYjk5MzY3NWMxOTZiNmM2NzIwZWVhNjM3YmYyZGNkY2IzOWNiMzU2YTI0OGM1YzE5YWRkYWQzYmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e491417377e841edb844ac964d6fcd9b",
+      "statement": "Tab/window events, removal, navigation completion and popup clear maintain marker state; navigation re-injects only the marked background tab.",
+      "evidence": [
+        {
+          "resource": "repo://background.js#L118-L180",
+          "version": "repo-lines-v1:sha256:26477897a99bb04a5a37bbfc247ba3eaaa86cf39ce45514006b2e43f5f6422d9:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1Y2RlZjgwODVhZTc0YWI2MzZkNjQ1OWY1YzZkNWZiZmIwZGIyNjRmMWIwZDc1YmFjNTE5YzliM2Y2NzE3YWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzOGNiZDBjYmU5NDY1M2YwMWRkMjhkZTVlMmRkMTU4MDAyY2E1Y2UzM2M5MjY1NmVjYWNhYjlhZWJhNDM1ZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU4YzZkMzkwYzI0ZDBlYmM4MjE4MzE0YWI0ZWIyYWE2MTQyYmY1N2RmNjNhMGM1YWI4N2U1NmQ1NjUyYWU5NjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_95e099c506424099a07beb7b400391ae",
+      "statement": "Installation queries the active tab when initializing state, while startup resets state without that query.",
+      "evidence": [
+        {
+          "resource": "repo://background.js#L174-L201",
+          "version": "repo-lines-v1:sha256:078235a3947066deef087359ebfbbae2c02f3cb0a2b49742d67783e75ba3b95f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhMWRhMmY5MDU2MjE0MTg3ODRhNTQ5OGUzNzZmZGI5NDk3M2RlMmQ2MzI5NWIxMjM5ZTY5YjYyYTYwNmZmMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5OWQ5N2U0ZDM1N2NiYzc1YjBhYjNlMWFiNjI2YzcwNTk1NjQ2NWJjM2VhMDUxNWZjZGFmZTQ0MTQyZTExYmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1f0641e3ffd74bf9b62ae3ec16bef082",
+      "statement": "Marker injection uses content.js and clearing invokes window.__lthMarker.stop; content reinjection reuses the existing marker object.",
+      "evidence": [
+        {
+          "resource": "repo://background.js#L54-L82",
+          "version": "repo-lines-v1:sha256:0655b380f468683079e3b4abfa0f833792b752a29bd05691ac43e83c3e06c83a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzODc5NDE3ZGM3NzE2YjIwMzBjNzA4MmI5NzM1M2M2Y2E3MzUwMjNmNjBkNDI1ZWQ5NDYxZjkzM2YyMzI3NjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3NzU0ZTNlMGQxZWRlMWU0ZTJmY2QwZWY3MmIxNDk3NDI2NTEyZWQwN2EwY2UxYjdhODE2MDQ5MTk2MDhjOTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEyM2M1NWFlNWQxYzZkN2JiYjNiZDNhOWM5OTczZGZkMzM2YzRjNDUxMWM0OTk2NDQyZDU0ZDdlM2JlNDk2MWYifQ"
+        },
+        {
+          "resource": "repo://content.js#L1-L7",
+          "version": "repo-lines-v1:sha256:66dd69bb249aca8df584f173f2e64f134b1598a7dd63cd27fd9e24a4f1cce7da:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyOTlkMjI0ZGQ3OTdkZjVkNmZlZThhNDk2ZjllMWIwYjhhYzU2OTMwM2E1M2I3OWUzMWJjNzBlMTgzNWEwNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjJhM2VkNGZmM2YyY2IwYjhkMzFlNWY0ZWI1NzA0OGUzOTg4YTBmZTAxMzIzNGVkNzA5ZTg5ZjFiMjJlY2Q4NiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7156ec2cd7e24cdcad6bfd15256d092d",
+      "statement": "The content marker uses a static title prefix and MutationObserver on an existing title element; stop disconnects and restores the original start-time title snapshot.",
+      "evidence": [
+        {
+          "resource": "repo://content.js#L10-L62",
+          "version": "repo-lines-v1:sha256:47ab018c12ccf34f62207100d9ff6819ad5b0d361fd2ef5ba9a29579fe2ec33e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxY2RkODU5YTljY2E5Y2U5NmI4OWI3OTZjNWE5NWJhYjI3M2QzZTdhNDZiNzYyOGI0ZmIyOWViYjRhNzQwZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5ZmFjNWEzMDM5YmJhZDI4N2FjODE1ZDUzM2NmM2FiZDRiNDIxNzkyMGNiZTJjOTNiYjM0YTZlMzAwMDMxNDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZDIyOTAyOWY2ZjJlMDc0NjJkZTdmMWNmNmUzMDA0OTNlMGI0NTI2YmQ3NmQ3YzQ0NWQyMTliZTY3N2Y5NDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_61f846d38ad548b4b2ea261b0a8f460e",
+      "statement": "Prefix stripping uses PREFIX_REGEX independently from PREFIX, and the observer remains attached to the title element found on start.",
+      "evidence": [
+        {
+          "resource": "repo://content.js#L10-L45",
+          "version": "repo-lines-v1:sha256:c450fbe193da786c0c343ea5b01016c09a8e93f321e6ae03c24574aced6a832e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxY2RkODU5YTljY2E5Y2U5NmI4OWI3OTZjNWE5NWJhYjI3M2QzZTdhNDZiNzYyOGI0ZmIyOWViYjRhNzQwZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZDIyOTAyOWY2ZjJlMDc0NjJkZTdmMWNmNmUzMDA0OTNlMGI0NTI2YmQ3NmQ3YzQ0NWQyMTliZTY3N2Y5NDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVmNmYwYTZlNzdkMDdhN2Y5NDJjMjQxN2E3ZmFlZGJkZGU5N2NjYzNmMDcxMzZmODFkNWVmOWNjMzZmOWNkYmUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_81c79724278c479cbea0e0c18383cfaf",
+      "statement": "The current content marker changes document.title only and contains no favicon or tab-group mutation.",
+      "evidence": [
+        {
+          "resource": "repo://content.js",
+          "version": "repo-file-v1:sha256:7326361e5259547a1b83ab04e46bba5880d60eae3529165846c7f1783bd9a20c"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-10-05T03:53:51.432Z"
+  }
+}

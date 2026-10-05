@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "pages": {
+    "/openwiki/architecture/marker-lifecycle.md": {
+      "pageVersion": "sha256:ea3622ebb929e63248c841bbffff698ab45126d9d17677c663acda0cec6dba62",
+      "completedBy": "codex",
+      "completedRunId": "ed871888-d030-480f-a913-dc2c96399e54",
+      "gitHead": "4c60b1e80d8c9e39835978877a8636f0004212c2",
+      "sourceFingerprint": "sha256:33c10f380a3585405fce741edbff03ca675fede91e9979f6a93ce0cd4082df27"
+    },
+    "/openwiki/quickstart.md": {
+      "pageVersion": "sha256:8358889e56ba386f1c947f87036587c724f3fdc139d079b7db711f7533ad00b7",
+      "completedBy": "codex",
+      "completedRunId": "ed871888-d030-480f-a913-dc2c96399e54",
+      "gitHead": "4c60b1e80d8c9e39835978877a8636f0004212c2",
+      "sourceFingerprint": "sha256:33c10f380a3585405fce741edbff03ca675fede91e9979f6a93ce0cd4082df27"
+    }
+  }
+}

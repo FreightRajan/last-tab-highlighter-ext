@@ -1,0 +1,33 @@
+# Local secrets and credentials; example templates remain researchable.
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+.clasprc.json
+.clasp.json
+credentials.json
+secrets/
+
+# Dependencies, build outputs, caches, and generated reports.
+node_modules/
+.next/
+.turbo/
+.cache/
+dist/
+dist-zip/
+build/
+coverage/
+playwright-report/
+test-results/
+*.log
+*.tsbuildinfo
+
+# Local data stores and database backups.
+*.sqlite
+*.sqlite3
+*.db
+*.dump

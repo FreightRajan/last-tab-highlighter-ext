@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:8358889e56ba386f1c947f87036587c724f3fdc139d079b7db711f7533ad00b7",
+  "claims": [
+    {
+      "id": "claim_ae78018aad8e41ac8b27a2336bb5da0b",
+      "statement": "The extension is Manifest V3, with background.js as service worker, popup.html as action popup, and scripting/storage plus all_urls host permission.",
+      "evidence": [
+        {
+          "resource": "repo://manifest.json",
+          "version": "repo-file-v1:sha256:b6cad09b572718af0b6b4a6f89bf849bcc033a249c66ec94b47735ada9110cb3"
+        }
+      ]
+    },
+    {
+      "id": "claim_c59b5fddf4764ee285bf39f321c50bf8",
+      "statement": "For A to B to C switching, handleTabSwitch clears the prior marker and marks the leaving tab B; this differs from the README sentence saying C is marked.",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L9-L13",
+          "version": "repo-lines-v1:sha256:78afc540cb2ff0c5aee546da01505614da373ca6c399f250ecec1bff261bd8b3:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmQzNWFjYTM3Y2FhNzBlMGMzNDFjOTk4N2IyNTc4MmQxNjczMTM0OGUxYjRhZWY2NTA2OGFjNGZkYjE5YmVlNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWM2ZGU5MDgyYjc4Mjg0MDI4ZWY1MGRmNmY1OTRjOTVhOTE2NzY4N2YwNzgyZmI2OGE5ZjI1MDI1YjIwN2JlNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTI1NDNlMDJhMjhmMzI4YmEwYjgwMzBlYjBmYzEyNjI4MTIyYzVmODM4Njk3NTNiZmE0MzQ4NjM0ZmZkMjJkNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTVhNzkzMDc0OTkzNjNjNDI3MjJlOTQ4NmMyMWM3NzVjMTczZWZkM2E5N2YwMDRhOTVkYmU3ZGY2MjY4OTQ1YiJ9"
+        },
+        {
+          "resource": "repo://background.js#L85-L115",
+          "version": "repo-lines-v1:sha256:bdf325eabaf30ded9c5578d71b6b8f67bbb250c513de44c8362a21fb7317d025:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2MjkxOWZkNWMxMWYyOTZhZTQ5MTZkZDMyYmJjYTk1YTM3M2IzZDA0YmEzNTg5M2VhZGRkMzY4OThlZWVlYzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0M2ZjMTdlZTU5YTFlNGQ1M2RhNjliZjA3NjhmMWEwZjQ5MWRlYTBmYjljOWQ5MTI4YmMxMDdkOTBiYzY1N2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxZGQwYjg4YTFjNzdjM2FmMmZlNTQ3ZDdjNzU5MWUwMWVmZWQ5ZGE3N2Y2MTg4NTY5MmM5Mjc0YTA0YTM3YzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZjMDRlYzJlYjk5MzY3NWMxOTZiNmM2NzIwZWVhNjM3YmYyZGNkY2IzOWNiMzU2YTI0OGM1YzE5YWRkYWQzYmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7c04ee7247bd43678919f3507c9f5716",
+      "statement": "The README describes loading an unpacked extension, and deploy-lth.ps1 pulls with rebase then opens the extension page for a manual reload.",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L15-L27",
+          "version": "repo-lines-v1:sha256:53f4f53d760b0f0f30ba319f170c199f631b94aa501d9902f87391f7f7893b45:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiOTYzZTJhOGE2YmNjY2E2MDBhNzdiMjJiZDE2ZDNiMGVkYzZiODllZjJiMTg5MzU0NDQwYzFjYWI1NzVlZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViYTIyZmVmNGU4NGJjMzFmNmY0MDA4MGQ5OGFkMWFlODQzMzBlYjZjNGE1YTg4OWQwMzA5OGIwMDFjMDlkZjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3N2Q3MDJiMGE5ZWI2ZjBmNmY0Mjc0MjFkMmY1ZGRmYzNlM2Q1NWQzMWUxZmJiN2U1MzI2YWQxZWQwOTE3ZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYmVmNGE0MGRhMzRiNGRjYzFhOTI3ZWEwY2MxNDlmZGVkNGM5NTYzZDgwYzhmNzdlZmFjMGQ3N2JiZDgzOTkifQ"
+        },
+        {
+          "resource": "repo://deploy-lth.ps1",
+          "version": "repo-file-v1:sha256:2b8060276b1c9e696e0190b99afe5abc0ed1273341fbf34f3133cf2169658800"
+        }
+      ]
+    },
+    {
+      "id": "claim_c7c95026cf7e4c0882254cfa03600df5",
+      "statement": "canInject allows HTTP, HTTPS and file schemes while excluding Chrome Web Store URLs, and startMarker handles injection failures.",
+      "evidence": [
+        {
+          "resource": "repo://background.js#L40-L68",
+          "version": "repo-lines-v1:sha256:435dfebf17d215ea140035c0e2e8ceace42683287b2770665343329db6dd26a6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmMTliZTVlZTljZDE4NjRhMTFlMTE0M2FhY2QyZTQwMGQxNGVjZTJjMTc0MzYwOWY4MTAyMzg4NGYwN2QyMTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY5YmY1NGIxYTdjOTc0YzRmZTVjNGE2NmEyNjUzNWI1MDI1Y2U1OGFmZWI4ZTZjMzBlYTNlMDVmOWQ4MzY2OTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2NDYyZWM1NmY4NzllYTliZjdjYWRiOTk3YmZlNmI2MGRiNThkZTBiN2UyYzA1Y2MzYjJmM2I1OGVkYzEwOGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_180f79b0984641afa57037434f381a40",
+      "statement": "The popup Clear marker button sends a clear message and displays temporary result feedback.",
+      "evidence": [
+        {
+          "resource": "repo://popup.js",
+          "version": "repo-file-v1:sha256:35f94b1246c475b7f9650abf3ba550da3f347c9763957d78ff554a722c312b4b"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-10-05T03:53:51.432Z"
+  }
+}
